@@ -1,0 +1,49 @@
+name: reflex-build
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 6 * * 1' # weekly rescan
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/reflex-automation/reflex-server:main
+
+jobs:
+  build-push:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: tools/docker/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE }}
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '0'
+
+  rescan:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
