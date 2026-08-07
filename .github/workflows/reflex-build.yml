@@ -30,7 +30,7 @@ jobs:
           file: tools/docker/Dockerfile
           push: true
           tags: ${{ env.IMAGE }}
-      - uses: aquasecurity/trivy-action@0.28.0
+      - uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.IMAGE }}
           severity: CRITICAL,HIGH
@@ -41,7 +41,7 @@ jobs:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: aquasecurity/trivy-action@0.28.0
+      - uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.IMAGE }}
           severity: CRITICAL,HIGH
