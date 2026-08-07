@@ -5,7 +5,7 @@ ARG STATIC_ROOT=/var/lib/eda/static
 
 # python3.11 and python3.12 supported
 ARG PYTHON_BIN="python3.12"
-ARG ANSIBLE_CORE_VER=2.16
+ARG ANSIBLE_CORE_VER=2.16.19
 
 RUN useradd --uid "$USER_ID" --gid 0 --home-dir /app --create-home eda \
     && mkdir -p /app/.local /var/lib/eda/ \
