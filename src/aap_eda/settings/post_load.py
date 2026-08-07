@@ -174,7 +174,7 @@ def get_rulebook_process_log_level(
 
 def _get_spectacular_settings(settings: Dynaconf) -> dict:
     return {
-        "TITLE": "Event Driven Ansible API",
+        "TITLE": "Reflex API",
         "VERSION": utils.get_package_version("aap-eda"),
         "SERVE_INCLUDE_SCHEMA": False,
         "SCHEMA_PATH_PREFIX": f"/{settings.API_PREFIX}/v[0-9]",
