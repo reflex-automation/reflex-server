@@ -1,73 +1,54 @@
-![Maintained? yes](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
+# Reflex Server
 
-[![codecov](https://codecov.io/gh/ansible/eda-server/graph/badge.svg?token=N6Z2DZGKGZ)](https://codecov.io/gh/ansible/eda-server)
+The API server for **Reflex** — a community-maintained continuation of
+Event-Driven Ansible (EDA), kept working against open-source AWX-compatible
+controllers, primarily [CIQ Ascender](https://ciq.com/products/ascender).
 
-[![GitHub Workflow Status](https://github.com/ansible/eda-server/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/ansible/eda-server/actions/workflows/ci.yaml?query=branch%3Amain)
+Red Hat stopped developing EDA as a supported open-source product; the code
+lives on as the internal upstream of Ansible Automation Platform. Reflex
+tracks that upstream ([ansible/eda-server](https://github.com/ansible/eda-server))
+as a friendly fork: small patch set, regular merges, fixes offered upstream
+where they fit.
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ansible_eda-server&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ansible_eda-server)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ansible_eda-server&metric=coverage)](https://sonarcloud.io/summary/overall?id=ansible_eda-server)
+## What Reflex adds
 
-![Python 3.11](https://img.shields.io/badge/Python-3.11-blue)
-![Python 3.12](https://img.shields.io/badge/Python-3.12-blue)
+- **Standalone deployments work out of the box** — `RESOURCE_SERVER__URL`
+  defaults to empty, so session/UI login works without an AAP gateway
+  (upstream's default silently switches auth to JWT-only).
+- **Tested against Ascender** — releases are smoke-tested end-to-end: a
+  webhook-triggered rulebook activation launching a job template on
+  Ascender via `run_job_template`.
+- **Published images** — `ghcr.io/reflex-automation/reflex-server`.
+- **Firewall/emulation-proof image builds** — GitHub host keys are baked
+  into the build instead of `ssh-keyscan` at build time.
 
-# Event Driven Ansible Controller
+Internal identifiers (the `aap_eda` Python package, `/api/eda/v1` API paths,
+`EDA_*` settings) deliberately keep their upstream names so merges stay clean.
 
-This repository contains the source code for the Event Driven Ansible Controller, aka EDA-Controller.
+## Deployment
 
-Licensed under [Apache Software License 2.0](LICENSE)
+Deploy on Kubernetes with
+[reflex-operator](https://github.com/reflex-automation/reflex-operator).
+The related projects:
 
-## How to install
+| Repo | Role |
+|---|---|
+| [reflex-operator](https://github.com/reflex-automation/reflex-operator) | K8s operator deploying the stack |
+| [reflex-ui](https://github.com/reflex-automation/reflex-ui) | Web UI |
+| [reflex-decision-environment](https://github.com/reflex-automation/reflex-decision-environment) | Container image activations run in |
 
-Refer to the [deployment guide](docs/deployment.md) for further information if you want to install and run the application.
+For development and non-k8s deployment, upstream's docs still apply:
+[deployment guide](docs/deployment.md), [development guide](docs/development.md).
 
-## Development environment
+## OpenAPI
 
-Refer to the [development guide](docs/development.md) for further information if you want to setup a development environment.
+From a running instance: API docs at `/api/eda/v1/docs/`, schema at
+`/api/eda/v1/openapi.json`.
 
-## Contributing
+## License and attribution
 
-We ask all of our community members and contributors to adhere to the [Ansible code of conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
-If you have questions or need assistance, please reach out to our community team at <codeofconduct@ansible.com>
-
-Refer to the [Contributing guide](docs/contributing.md) for further information.
-
-## Communication
-
-See the [Communication](https://github.com/ansible/eda-server/blob/main/docs/contributing.md#communication) section of the
-Contributing guide to find out how to get help and contact us.
-
-For more information about getting in touch, see the
-[Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
-
-## OpenAPI specification
-
-For a comprehensive guide (runtime, development, authentication, code samples, troubleshooting), see [docs/openapi-access.md](docs/openapi-access.md).
-
-You can access the Event Driven Ansible OpenAPI specification from a
-running instance:
-
-- API docs (browser):
-  - http://$HOST:$PORT/api/eda/v1/docs/
-- OpenAPI JSON:
-  - http://$HOST:$PORT/api/eda/v1/openapi.json
-Download examples:
-
-```bash
-# Basic auth (JSON)
-curl -u admin:password \
-  "http://localhost:8000/api/eda/v1/openapi.json" -o eda.json
-
-# Token auth (JSON)
-curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:8000/api/eda/v1/openapi.json" -o eda.json
-```
-
-Notes:
-- Endpoints may require authentication depending on your deployment.
-- For HTTPS with self-signed certificates, add `-k` to curl for local testing.
-- The specification's `info.version` reflects the installed `aap-eda`
-  package version on the running instance, from `pyproject.toml`.
-
-## Credits
-
-EDA-Controller is sponsored by [Red Hat, Inc](https://www.redhat.com).
+Apache-2.0, unchanged from upstream — see [LICENSE](LICENSE).
+Based on [ansible/eda-server](https://github.com/ansible/eda-server),
+© Red Hat, Inc. and contributors. Reflex is a community project and is not
+affiliated with or endorsed by Red Hat. "Ansible" is a trademark of
+Red Hat, Inc.
