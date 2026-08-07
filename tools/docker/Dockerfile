@@ -50,9 +50,11 @@ ENV POETRY_VERSION="2.*" \
 USER "$USER_ID"
 
 # Setup SSH for non-root user
-RUN mkdir -p /app/.ssh \
-    && ssh-keyscan github.com >> /app/.ssh/known_hosts \
-    && chmod 700 /app/.ssh \
+# GitHub host keys are baked in (from https://api.github.com/meta) instead of
+# ssh-keyscan at build time, which requires outbound port 22 and breaks under
+# qemu emulation and behind firewalls.
+COPY --chown="$USER_ID" ./tools/docker/github_known_hosts /app/.ssh/known_hosts
+RUN chmod 700 /app/.ssh \
     && chmod 644 /app/.ssh/known_hosts
 
 # Install poetry, create virtual environment
