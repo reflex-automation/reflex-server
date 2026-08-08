@@ -86,7 +86,7 @@ awx-plugins-core = { version = "^0.0.1a10", extras = [
                     ]}
 pyasn1 = ">=0.6.4"
 # limit setuptools to avoid the pkg_resources removal
-setuptools = "<82"
+setuptools = "<84"
 
 
 [tool.poetry.group.test.dependencies]
