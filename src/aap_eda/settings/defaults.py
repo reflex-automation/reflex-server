@@ -197,10 +197,9 @@ ACTIVATION_DB_LOG_RETENTION_DAYS: int = 0
 ANSIBLE_BASE_JWT_VALIDATE_CERT: bool = False
 ANSIBLE_BASE_JWT_KEY: str = "https://localhost"
 
-# Default Not allow local resource management.
-# Ignore what is set in DAB.
-# Can be changed via ENV
-ALLOW_LOCAL_RESOURCE_MANAGEMENT: bool = False
+# Reflex is standalone (no AAP gateway), so users/teams/orgs are managed
+# locally by default. Can be changed via ENV.
+ALLOW_LOCAL_RESOURCE_MANAGEMENT: bool = True
 
 # These settings have defaults in DAB
 # RESOURCE_SERVICE_PATH

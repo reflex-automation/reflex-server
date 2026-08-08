@@ -204,8 +204,8 @@ def test_union_type_exception_msg(mock_settings):
 
 
 def test_allow_local_resource_management(mock_settings):
-    # default is False
-    assert mock_settings.ALLOW_LOCAL_RESOURCE_MANAGEMENT is False
+    # standalone default is True
+    assert mock_settings.ALLOW_LOCAL_RESOURCE_MANAGEMENT is True
 
 
 def test_websocket_worker_authentication_classes(mock_settings):
