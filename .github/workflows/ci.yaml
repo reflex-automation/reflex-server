@@ -44,18 +44,6 @@ jobs:
           name: openapi-spec
           path: openapi.json
 
-  sync-openapi-spec:
-    needs: validate-openapi-spec
-    if: |
-      github.repository == 'ansible/eda-server' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    uses: ./.github/workflows/sync-openapi-spec.yml
-    secrets:
-      OPENAPI_SPEC_SYNC_TOKEN: ${{ secrets.OPENAPI_SPEC_SYNC_TOKEN }}
-      OPENAPI_SPEC_REPO: ${{ secrets.OPENAPI_SPEC_REPO }}
-      OPENAPI_SPEC_SYNC_GPG_PRIVATE_KEY: ${{ secrets.OPENAPI_SPEC_SYNC_GPG_PRIVATE_KEY }}
-      OPENAPI_SPEC_PR_REVIEW_TEAM: ${{ secrets.OPENAPI_SPEC_PR_REVIEW_TEAM }}
-
   test:
     runs-on: ubuntu-latest
     # Required for OIDC: https://github.com/codecov/codecov-action?tab=readme-ov-file#using-oidc
