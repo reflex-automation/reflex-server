@@ -7,8 +7,9 @@ controllers, mainly [CIQ Ascender](https://ciq.com/products/ascender).
 Red Hat stopped developing EDA as a supported open-source product and now
 uses the code as the internal upstream of Ansible Automation Platform.
 Reflex tracks [ansible/eda-server](https://github.com/ansible/eda-server)
-as a friendly fork: the patch set stays small, merges happen regularly,
-and fixes get offered upstream where they fit.
+as a friendly fork: the patch set stays small, upstream merges happen
+regularly, CVEs get patched, and fixes get offered upstream where they
+fit.
 
 ## What Reflex adds
 
