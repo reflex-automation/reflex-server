@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from ansible_base.lib.dynamic_config.dynamic_urls import (
+    api_urls as dab_api_urls,
     api_version_urls as dab_urls,
 )
 from ansible_base.rbac.service_api.urls import rbac_service_urls
@@ -89,6 +90,9 @@ eda_v1_urls = [
     path("config/", views.ConfigView.as_view(), name="config"),
     path("status/", core_views.StatusView.as_view(), name="status"),
     path("", include(openapi_urls)),
+    # shadows DAB's ui_auth route, whose get() signature is broken without
+    # ansible_base.api_documentation installed
+    path("ui_auth/", views.UIAuthView.as_view(), name="ui_auth-view"),
     path(
         "auth/session/login/",
         views.SessionLoginView.as_view(),
@@ -119,5 +123,7 @@ v1_urls = eda_v1_urls + dab_urls
 urlpatterns = [
     path("v1/", include(v1_urls)),
     path("v1/", views.ApiV1RootView.as_view(), name="api-v1-root"),
+    # social auth login/complete routes (/api/eda/social/...)
+    path("", include(dab_api_urls)),
     path("", views.ApiRootView.as_view(), name="api-root"),
 ]

@@ -47,7 +47,7 @@ pyopenssl = ">=26.0.0"
 dynaconf = ">=3.2.13"
 kubernetes = "26.1.*"
 podman = "5.4.*"
-django-ansible-base = { git = "https://github.com/ansible/django-ansible-base.git", branch = "devel", extras = [
+django-ansible-base = { git = "https://github.com/ansible/django-ansible-base.git", rev = "77dc77e8ecdf466a76e3dfc1d20239824d5af337", extras = [
     "channel-auth",
     "rbac",
     "resource-registry",
@@ -55,6 +55,11 @@ django-ansible-base = { git = "https://github.com/ansible/django-ansible-base.gi
     "rest-filters",
     "feature-flags",
 ] }
+# social auth for DAB authenticators (OIDC/Keycloak/GitHub/Azure/Google);
+# deliberately not the DAB "authentication" extra, which drags in ldap/saml/xmlsec
+# and their system libs
+social-auth-app-django = "5.4.1"
+social-auth-core = "<=4.5.4"
 jinja2 = ">=3.1.5,<3.2"
 pexpect = "^4.9.0"
 ansible-runner = ">=2.4"

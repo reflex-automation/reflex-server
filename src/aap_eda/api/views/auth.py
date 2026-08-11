@@ -11,6 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+from ansible_base.authentication.views.ui_auth import UIAuth as DABUIAuth
 from django.contrib.auth import authenticate, login, logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
@@ -28,6 +29,22 @@ from aap_eda.api.serializers import (
     RefreshTokenSerializer,
 )
 from aap_eda.services.auth import jwt_access_token
+
+
+class UIAuthView(DABUIAuth):
+    """Fix DAB's UIAuth.get() signature.
+
+    Without ansible_base.api_documentation installed, DAB defines
+    get(self) with no request argument and every request 500s.
+    """
+
+    @extend_schema(
+        request=None,
+        description="UI authentication configuration, including enabled "
+        "SSO authenticators and their login URLs.",
+    )
+    def get(self, request, format=None):
+        return self._get()
 
 
 class SessionLoginView(APIView):
