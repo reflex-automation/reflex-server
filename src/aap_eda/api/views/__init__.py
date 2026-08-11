@@ -13,7 +13,12 @@
 #  limitations under the License.
 
 from .activation import ActivationInstanceViewSet, ActivationViewSet
-from .auth import SessionLoginView, SessionLogoutView, TokenRefreshView
+from .auth import (
+    SessionLoginView,
+    SessionLogoutView,
+    TokenRefreshView,
+    UIAuthView,
+)
 from .config import ConfigView
 from .credential_input_source import CredentialInputSourceViewSet
 from .credential_type import CredentialTypeViewSet
@@ -31,6 +36,7 @@ from .user import CurrentUserAwxTokenViewSet, CurrentUserView, UserViewSet
 __all__ = (
     # auth
     "SessionLoginView",
+    "UIAuthView",
     "SessionLogoutView",
     "TokenRefreshView",
     # project

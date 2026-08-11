@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "django_filters",
+    "ansible_base.authentication",
     "ansible_base.rbac",
     "ansible_base.resource_registry",
     "ansible_base.jwt_consumer",
