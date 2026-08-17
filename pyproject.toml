@@ -70,7 +70,6 @@ autobahn = ">=24.4.2"
 psycopg = "^3.1.17"
 xxhash = "3.4.*"
 pyjwt = { version = ">=2.13.0,<3", extras = ["crypto"] }
-ecdsa = "0.19.*"
 validators = "^0.34.0"
 django-flags = "^5.0.13"
 insights-analytics-collector = "^0.3.2"
