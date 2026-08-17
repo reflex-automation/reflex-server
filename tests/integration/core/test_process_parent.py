@@ -14,7 +14,7 @@
 
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from aap_eda.core import models
 from aap_eda.core.enums import ActivationRequest, ActivationStatus
@@ -24,7 +24,7 @@ from aap_eda.core.enums import ActivationRequest, ActivationStatus
     "instance",
     [
         pytest.param(
-            lazy_fixture("new_activation"),
+            lf("new_activation"),
             id="activation",
         ),
     ],
@@ -61,7 +61,7 @@ def test_latest_instance_field(
     "instance",
     [
         pytest.param(
-            lazy_fixture("new_activation"),
+            lf("new_activation"),
             id="activation",
         ),
     ],

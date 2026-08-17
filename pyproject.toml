@@ -94,13 +94,16 @@ setuptools = "<84"
 
 
 [tool.poetry.group.test.dependencies]
-pytest = "*"
+# <9 pinned deliberately: pytest 9's internals break pytest-lazy-fixtures'
+# pytest_generate_tests hook (GHSA-6w46-j5rx-g56g needs >=9.0.3, no plugin
+# supports it yet) - bump once the plugin catches up
+pytest = "<9"
 pytest-env = "*"
 pytest-django = "*"
 pytest-asyncio = "*"
 requests = { version = "*", python = "<4.0" }
 pytest-cov = "^4.1.0"
-pytest-lazy-fixture = "^0.6.3"
+pytest-lazy-fixtures = "^1.4.1"
 requests-mock = "*"
 httpie = "^3.2.3"
 freezegun = "^1.1.0"
@@ -108,7 +111,8 @@ freezegun = "^1.1.0"
 [tool.poetry.group.lint.dependencies]
 flake8 = "*"
 isort = "*"
-black = "*"
+# <24 pinned deliberately: 24.x reformats ~30 files, do that as its own PR
+black = "<24"
 flake8-broken-line = { version = "*", python = "<4.0" }
 flake8-string-format = "*"
 # This is an experimental linter.

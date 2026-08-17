@@ -15,7 +15,7 @@ from typing import Optional
 from unittest.mock import patch
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -255,12 +255,12 @@ def test_create_credential_type(
     ("client", "expected_code"),
     [
         pytest.param(
-            lazy_fixture("admin_client"),
+            lf("admin_client"),
             status.HTTP_403_FORBIDDEN,
             id="org_admin",
         ),
         pytest.param(
-            lazy_fixture("base_client"),
+            lf("base_client"),
             status.HTTP_401_UNAUTHORIZED,
             id="no_authenticated",
         ),
