@@ -97,7 +97,7 @@ setuptools = "<84"
 # <9 pinned deliberately: pytest 9's internals break pytest-lazy-fixtures'
 # pytest_generate_tests hook (GHSA-6w46-j5rx-g56g needs >=9.0.3, no plugin
 # supports it yet) - bump once the plugin catches up
-pytest = "<9"
+pytest = "<10"
 pytest-env = "*"
 pytest-django = "*"
 pytest-asyncio = "*"
