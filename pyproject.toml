@@ -112,7 +112,7 @@ freezegun = "^1.1.0"
 flake8 = "*"
 isort = "*"
 # <24 pinned deliberately: 24.x reformats ~30 files, do that as its own PR
-black = "<24"
+black = "<27"
 flake8-broken-line = { version = "*", python = "<4.0" }
 flake8-string-format = "*"
 # This is an experimental linter.
