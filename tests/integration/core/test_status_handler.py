@@ -14,7 +14,7 @@
 
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from aap_eda.core.enums import ACTIVATION_STATUS_MESSAGE_MAP, ActivationStatus
 from aap_eda.core.exceptions import (
@@ -28,7 +28,7 @@ from aap_eda.core.exceptions import (
     "instance",
     [
         pytest.param(
-            lazy_fixture("new_activation"),
+            lf("new_activation"),
             id="activation",
         ),
     ],
@@ -46,7 +46,7 @@ def test_save_with_errors(instance):
     "instance",
     [
         pytest.param(
-            lazy_fixture("new_activation"),
+            lf("new_activation"),
             id="activation",
         ),
     ],
@@ -69,7 +69,7 @@ def test_save_with_invalid_status(instance):
     "instance",
     [
         pytest.param(
-            lazy_fixture("new_activation"),
+            lf("new_activation"),
             id="activation",
         ),
     ],

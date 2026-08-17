@@ -14,7 +14,7 @@
 
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from aap_eda.core import enums, models
 from aap_eda.core.exceptions import (
@@ -102,7 +102,7 @@ def test_rulebook_process_save(init_data):
     "instance",
     [
         pytest.param(
-            lazy_fixture("new_rulebook_process_with_activation"),
+            lf("new_rulebook_process_with_activation"),
             id="activation",
         ),
     ],
@@ -120,7 +120,7 @@ def test_rulebook_process_parent_type(instance):
     "instance",
     [
         pytest.param(
-            lazy_fixture("new_rulebook_process_with_activation"),
+            lf("new_rulebook_process_with_activation"),
             id="activation",
         ),
     ],

@@ -22,7 +22,7 @@ from _pytest.logging import LogCaptureFixture
 from django.conf import settings as django_settings
 from django.utils import timezone
 from pytest_django.fixtures import SettingsWrapper
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from aap_eda.core import enums, models
 from aap_eda.services.activation.activation_manager import (
@@ -793,22 +793,22 @@ def test_delete_already_deleted(
     "activation,status",
     [
         pytest.param(
-            lazy_fixture("activation_with_instance"),
+            lf("activation_with_instance"),
             enums.ActivationStatus.STOPPED,
             id="stopped",
         ),
         pytest.param(
-            lazy_fixture("activation_with_instance"),
+            lf("activation_with_instance"),
             enums.ActivationStatus.ERROR,
             id="error",
         ),
         pytest.param(
-            lazy_fixture("activation_with_instance"),
+            lf("activation_with_instance"),
             enums.ActivationStatus.FAILED,
             id="failed",
         ),
         pytest.param(
-            lazy_fixture("activation_with_instance"),
+            lf("activation_with_instance"),
             enums.ActivationStatus.COMPLETED,
             id="completed",
         ),
@@ -894,7 +894,7 @@ def test_init_status_manager_with_activation(basic_activation):
     "process_parent",
     [
         pytest.param(
-            lazy_fixture("new_activation_with_instance"),
+            lf("new_activation_with_instance"),
         ),
     ],
 )
@@ -917,7 +917,7 @@ def test_status_manager_set_latest_instance_status(process_parent):
     "process_parent",
     [
         pytest.param(
-            lazy_fixture("new_activation_with_instance"),
+            lf("new_activation_with_instance"),
         ),
     ],
 )
