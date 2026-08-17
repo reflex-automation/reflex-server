@@ -12,12 +12,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import base64
-import hashlib
 from datetime import datetime
 
 import pytest
-from ecdsa import SigningKey
-from ecdsa.util import sigencode_der
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APIClient
@@ -106,8 +106,12 @@ def test_post_event_stream_with_ecdsa(
         data_bytes = JSONRenderer().render(data)
         message_bytes.extend(data_bytes)
 
-    sk = SigningKey.from_pem(ECDSA_PRIVATE_KEY, hashlib.sha256)
-    signature = sk.sign_deterministic(message_bytes, sigencode=sigencode_der)
+    private_key = load_pem_private_key(
+        ECDSA_PRIVATE_KEY.encode(), password=None
+    )
+    signature = private_key.sign(
+        bytes(message_bytes), ec.ECDSA(hashes.SHA256())
+    )
     if signature_encoding == "base64":
         signature_str = base64.b64encode(signature).decode()
     else:

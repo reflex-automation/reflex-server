@@ -14,19 +14,19 @@
 """Module providing all event stream authentication types."""
 
 import base64
-import hashlib
 import hmac
 import logging
 from abc import ABC, abstractmethod
 from binascii import unhexlify
 from dataclasses import dataclass
-from functools import partial
 from typing import Optional
 
-import ecdsa
 import jwt
 import requests
-from ecdsa.util import sigdecode_der
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from jwt import PyJWKClient, decode as jwt_decode
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
@@ -36,6 +36,26 @@ from aap_eda.core.utils.credentials import validate_x509_subject_match
 
 logger = logging.getLogger(__name__)
 DEFAULT_TIMEOUT = 30
+
+# python-ecdsa's pure-Python signature verification is not constant-time
+# (CVE-2024-23342 / GHSA-wj6h-64fc-37mp, Minerva timing attack on P-256;
+# upstream python-ecdsa has no fix planned). Use cryptography's
+# constant-time ECDSA verify instead for signatures on this
+# attacker-controlled path.
+_ECDSA_HASH_ALGORITHMS = {
+    "md5": hashes.MD5,
+    "sha1": hashes.SHA1,
+    "sha224": hashes.SHA224,
+    "sha256": hashes.SHA256,
+    "sha384": hashes.SHA384,
+    "sha512": hashes.SHA512,
+    "sha512_224": hashes.SHA512_224,
+    "sha512_256": hashes.SHA512_256,
+    "sha3_224": hashes.SHA3_224,
+    "sha3_256": hashes.SHA3_256,
+    "sha3_384": hashes.SHA3_384,
+    "sha3_512": hashes.SHA3_512,
+}
 
 
 class EventStreamAuthentication(ABC):
@@ -261,7 +281,11 @@ class EcdsaAuthentication(EventStreamAuthentication):
         logger.debug("Public Key %s", self.public_key)
         logger.debug("Signature %s", self.signature)
         logger.debug("Content Prefix %s", self.content_prefix)
-        public_key = ecdsa.VerifyingKey.from_pem(self.public_key.encode())
+        public_key = load_pem_public_key(self.public_key.encode())
+        if not isinstance(public_key, ec.EllipticCurvePublicKey):
+            error = "Public key is not an EC key"
+            logger.warning(error)
+            raise AuthenticationFailed(error)
 
         if self.signature_encoding == SignatureEncodingType.HEX:
             decoded_signature = unhexlify(self.signature)
@@ -280,17 +304,22 @@ class EcdsaAuthentication(EventStreamAuthentication):
             message_bytes.extend(self.content_prefix.encode())
 
         message_bytes.extend(body)
+
+        hash_algorithm = _ECDSA_HASH_ALGORITHMS.get(
+            self.hash_algorithm.lower()
+        )
+        if hash_algorithm is None:
+            error = f"Unsupported ECDSA hash algorithm {self.hash_algorithm}"
+            logger.warning(error)
+            raise AuthenticationFailed(error)
+
         try:
-            if not public_key.verify(
+            public_key.verify(
                 decoded_signature,
                 bytes(message_bytes),
-                partial(hashlib.new, self.hash_algorithm),
-                sigdecode=sigdecode_der,
-            ):
-                error = "ECDSA signature does not match"
-                logger.warning(error)
-                raise AuthenticationFailed(error)
-        except ecdsa.keys.BadSignatureError as exc:
+                ec.ECDSA(hash_algorithm()),
+            )
+        except InvalidSignature as exc:
             error = "ECDSA signature does not match"
             logger.warning(error)
             raise AuthenticationFailed(error) from exc
