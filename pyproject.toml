@@ -94,7 +94,8 @@ setuptools = "<84"
 
 
 [tool.poetry.group.test.dependencies]
-pytest = "<10"
+# 9.1 double-captures caplog records, breaks test_exceptions/test_project_import
+pytest = ">=9.0.3,<9.1"
 pytest-env = "*"
 pytest-django = "*"
 pytest-asyncio = "*"
