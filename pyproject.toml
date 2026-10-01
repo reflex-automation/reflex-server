@@ -94,10 +94,8 @@ setuptools = "<84"
 
 
 [tool.poetry.group.test.dependencies]
-# <9 pinned deliberately: pytest 9's internals break pytest-lazy-fixtures'
-# pytest_generate_tests hook (GHSA-6w46-j5rx-g56g needs >=9.0.3, no plugin
-# supports it yet) - bump once the plugin catches up
-pytest = "<9"
+# 9.1 double-captures caplog records, breaks test_exceptions/test_project_import
+pytest = ">=9.0.3,<9.1"
 pytest-env = "*"
 pytest-django = "*"
 pytest-asyncio = "*"
