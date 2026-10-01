@@ -66,7 +66,7 @@ ansible-runner = ">=2.4"
 python-gnupg = "^0.5.2"
 # indirectly needed by twisted, this version avoids issues with newer versions of setuptools:
 # https://github.com/crossbario/autobahn-python/pull/1632
-autobahn = ">=24.4.2"
+autobahn = ">=26.7.1"
 psycopg = "^3.1.17"
 xxhash = "3.4.*"
 pyjwt = { version = ">=2.13.0,<3", extras = ["crypto"] }
