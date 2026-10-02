@@ -122,3 +122,42 @@ def test_authenticators_crud_as_superuser(
 
     response = superuser_client.delete(f"{api_url_v1}/authenticators/{pk}/")
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+class _FakeSocial:
+    def __init__(self):
+        self.extra_data = {}
+
+    def set_extra_data(self, extra_data):
+        self.extra_data.update(extra_data or {})
+
+
+@pytest.mark.django_db
+def test_oidc_superuser_claim_survives_social_core_pipeline(
+    oidc_authenticator,
+):
+    """Drive DAB's OIDC extra_data through social-core's own pipeline step.
+
+    social-core 5 calls ``backend.extra_data(user, uid, response, details,
+    kwargs)`` positionally. A DAB build still on the 4.x signature raises
+    KeyError('social') here, which only shows up when the IdP sends an
+    admin claim.
+    """
+    from ansible_base.authentication.authenticator_plugins.utils import (
+        get_authenticator_class,
+    )
+    from social_core.pipeline.social_auth import load_extra_data
+
+    plugin = get_authenticator_class(oidc_authenticator.type)(
+        database_instance=oidc_authenticator
+    )
+    social = _FakeSocial()
+    load_extra_data(
+        backend=plugin,
+        details={"username": "jdoe"},
+        response={"sub": "jdoe", "is_superuser": True},
+        uid="jdoe",
+        user=None,
+        social=social,
+    )
+    assert social.extra_data["is_superuser"] is True
