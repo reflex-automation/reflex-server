@@ -4,6 +4,10 @@
   "tekton": {
     "enabled": true,
     "automerge": true,
-    "schedule": ["* */12 * * 1-5"]
+    "schedule": ["* 8,17 * * 5"],
+    "baseBranchPatterns": ["main", "/^stable-\\d+\\.\\d+$/"],
+    "postUpgradeTasks": {
+      "commands": []
+    }
   }
 }
