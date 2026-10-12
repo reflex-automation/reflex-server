@@ -40,9 +40,10 @@ Use a GitLab Event Stream credential (token in `X-Gitlab-Token`).
 ## Which pushes sync
 
 - GitHub events other than `push`, and GitLab events other than `Push Hook`,
-  are ignored (so tag push hooks do nothing).
+  are ignored (GitLab tag push hooks do nothing).
 - Branch deletes are ignored.
-- If the project has `scm_branch`, only pushes to that ref sync. With no
+- If the project has `scm_branch`, only pushes to that branch (or a tag of the
+  same name) sync. With no
   `scm_branch`, the repository's default branch from the payload is used.
   If neither is known, any push syncs.
 
@@ -63,7 +64,8 @@ Every pre-auth failure returns the same 403 so uuids can't be probed.
 ## Restarting activations
 
 A sync alone does not restart anything. Set `restart_on_project_update` on an
-activation and it restarts after a sync if its rulebook changed.
+activation and, after a sync, it restarts if it is enabled and its rulebook
+changed, or if it is in a failed or error state.
 
 ## Gotchas
 
