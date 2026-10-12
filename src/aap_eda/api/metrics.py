@@ -121,7 +121,7 @@ class MetricsTokenAuthentication(BaseAuthentication):
         if (
             token
             and len(parts) == 2
-            and parts[0] == "Bearer"
+            and parts[0].lower() == "bearer"
             and hmac.compare_digest(parts[1].encode(), token.encode())
         ):
             return None, TOKEN_OK

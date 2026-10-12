@@ -11,10 +11,6 @@ from aap_eda.core import models
 from tests.integration.constants import api_url_v1
 
 URL = f"{api_url_v1}/metrics/"
-JWT_CLASSES = [
-    "ansible_base.jwt_consumer.eda.auth.EDAJWTAuthentication",
-    "aap_eda.api.authentication.WebsocketJWTAuthentication",
-]
 
 
 def bearer(token):
@@ -49,18 +45,14 @@ def test_superuser_basic_auth(super_user):
     assert client.get(URL).status_code == status.HTTP_200_OK
 
 
-@pytest.mark.parametrize("jwt", [False, True])
 @pytest.mark.django_db
-def test_token_auth(base_client, settings, jwt):
+def test_token_auth(base_client, settings):
     settings.METRICS_TOKEN = "s3cret"
-    if jwt:
-        settings.REST_FRAMEWORK = {
-            **settings.REST_FRAMEWORK,
-            "DEFAULT_AUTHENTICATION_CLASSES": JWT_CLASSES,
-        }
     ok = base_client.get(URL, **bearer("s3cret"))
     assert ok.status_code == status.HTTP_200_OK
     assert ok["Content-Type"] == metrics.CONTENT_TYPE
+    lower = base_client.get(URL, HTTP_AUTHORIZATION="bearer s3cret")
+    assert lower.status_code == status.HTTP_200_OK
     bad = base_client.get(URL, **bearer("nope"))
     assert bad.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -113,3 +105,10 @@ def test_body_series(
 def test_label_escaping():
     out = metrics.render([("m", "gauge", "h", [({"a": 'x\\y"z\nw'}, 1)])])
     assert 'm{a="x\\\\y\\"z\\nw"} 1' in out
+
+
+@pytest.mark.django_db
+def test_not_in_openapi_schema(superuser_client):
+    r = superuser_client.get(f"{api_url_v1}/openapi.json")
+    assert r.status_code == status.HTTP_200_OK
+    assert "/metrics" not in r.content.decode()
