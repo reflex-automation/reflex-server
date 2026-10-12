@@ -257,6 +257,15 @@ def test_tag_ref_matches_only_when_scm_branch_names_tag(
 
 
 @pytest.mark.django_db
+def test_full_ref_scm_branch_matches(hmac_project, sync_mock):
+    hmac_project.scm_branch = "refs/heads/main"
+    hmac_project.save()
+    response = post_push(hmac_project, {"ref": "refs/heads/main"})
+    assert response.status_code == status.HTTP_202_ACCEPTED
+    sync_mock.assert_called_once()
+
+
+@pytest.mark.django_db
 def test_empty_scm_branch_uses_payload_default_branch(hmac_project, sync_mock):
     hmac_project.scm_branch = ""
     hmac_project.save()

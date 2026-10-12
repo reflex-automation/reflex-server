@@ -93,7 +93,7 @@ def _wants_sync(project: Project, request, payload: dict) -> bool:
     ref = payload.get("ref")
     if not want or not ref:
         return True
-    return ref in (f"refs/heads/{want}", f"refs/tags/{want}")
+    return ref in (want, f"refs/heads/{want}", f"refs/tags/{want}")
 
 
 class ExternalProjectViewSet(viewsets.GenericViewSet):
