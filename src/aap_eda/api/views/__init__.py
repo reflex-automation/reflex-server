@@ -30,6 +30,7 @@ from .decision_environment import DecisionEnvironmentViewSet
 from .eda_credential import EdaCredentialViewSet
 from .event_stream import EventStreamViewSet
 from .external_event_stream import ExternalEventStreamViewSet
+from .external_project import ExternalProjectViewSet
 from .organization import OrganizationViewSet
 from .project import ProjectViewSet
 from .root import ApiRootView, ApiV1RootView
@@ -75,4 +76,5 @@ __all__ = (
     "EventStreamViewSet",
     # External event stream
     "ExternalEventStreamViewSet",
+    "ExternalProjectViewSet",
 )
