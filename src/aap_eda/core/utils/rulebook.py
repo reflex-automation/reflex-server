@@ -300,7 +300,9 @@ def _suggest_only_action(action: object) -> object:
         return action
     for key in _SUGGEST_ONLY_ACTIONS:
         if key in action:
-            args = action[key] or {}
+            args = action[key]
+            if not isinstance(args, dict):
+                args = {}
             msg = f"suggest_only: would {key} {args.get('name', '')}"
             if args.get("organization"):
                 msg += f" (organization {args['organization']})"

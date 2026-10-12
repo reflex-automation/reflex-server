@@ -295,3 +295,17 @@ def test_make_suggest_only():
         {"debug": {"msg": "keep"}},
         {"set_fact": {"fact": {"a": 1}}},
     ]
+
+
+def test_make_suggest_only_non_mapping_args():
+    data = """
+- name: rs
+  hosts: all
+  rules:
+    - name: r
+      condition: event.i == 1
+      action:
+        run_job_template: oops
+"""
+    out = yaml.safe_load(make_suggest_only(data))
+    assert "debug" in out[0]["rules"][0]["action"]
