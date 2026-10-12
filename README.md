@@ -1,15 +1,16 @@
 # Reflex Server
 
-The API server for Reflex, a community-maintained continuation of
-Event-Driven Ansible (EDA) that targets open-source AWX-compatible
-controllers, mainly [CIQ Ascender](https://ciq.com/products/ascender).
+The API server for Reflex, a close-tracking fork of Event-Driven Ansible
+(EDA) for standalone use with open-source AWX-compatible controllers, mainly
+[CIQ Ascender](https://ciq.com/products/ascender).
 
-Red Hat stopped developing EDA as a supported open-source product and now
-uses the code as the internal upstream of Ansible Automation Platform.
-Reflex tracks [ansible/eda-server](https://github.com/ansible/eda-server)
-as a friendly fork: the patch set stays small, upstream merges happen
-regularly, CVEs get patched, and fixes get offered upstream where they
-fit.
+[ansible/eda-server](https://github.com/ansible/eda-server) is actively
+developed in public by Red Hat. Reflex exists for the things upstream does
+not carry by default, such as standalone login (see below), plus a
+user-facing rebrand, published images and end-to-end smoke tests against
+Ascender. It is a friendly fork: the patch set stays small, upstream merges
+happen regularly, CVEs get patched, and fixes get offered upstream where
+they fit.
 
 ## What Reflex adds
 
@@ -22,6 +23,17 @@ fit.
 - Images are published at `ghcr.io/reflex-automation/reflex-server`.
 - Image builds work behind firewalls and under emulation. GitHub host keys
   are baked in instead of running `ssh-keyscan` at build time.
+- SSO login through OIDC, Keycloak, GitHub, Azure AD and Google:
+  [docs/sso.md](docs/sso.md).
+- Prometheus metrics at `/api/eda/v1/metrics/`: [docs/metrics.md](docs/metrics.md).
+- Push webhook that syncs a project from GitHub or GitLab:
+  [docs/project-webhook.md](docs/project-webhook.md).
+- Suggest-only activations: set `suggest_only` on an activation and its
+  `run_job_template`, `run_workflow_template`, `run_playbook` and `run_module`
+  actions are replaced with a `debug` action that logs what would have run
+  (`suggest_only: would run_job_template <name>`). Other actions still run.
+  The flag can only be changed while the activation is disabled, and the
+  activation still needs its controller credentials to start.
 
 Internal identifiers (the `aap_eda` Python package, `/api/eda/v1` API
 paths, `EDA_*` settings) keep their upstream names so merges stay clean.
