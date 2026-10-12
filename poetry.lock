@@ -183,14 +183,14 @@ visualize = ["Twisted (>=16.1.1)", "graphviz (>0.5.1)"]
 
 [[package]]
 name = "awx-plugins-core"
-version = "0.0.1a10"
+version = "0.2.0a0"
 description = "A temporary home for the essential AWX plugins"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "awx_plugins_core-0.0.1a10-py3-none-any.whl", hash = "sha256:9f191a6b00ddec5989948375bf6dec1d844ce75c3bc67e22aa623df8cde51f17"},
-    {file = "awx_plugins_core-0.0.1a10.tar.gz", hash = "sha256:c599934bbf8d50aea738757d294c6b80f919bb353154069697c11523381a1918"},
+    {file = "awx_plugins_core-0.2.0a0-py3-none-any.whl", hash = "sha256:cfdeae8c3a5f10a8c93769457dd2ccf6bf9fbdb18133d925d00ca4af73ff58b5"},
+    {file = "awx_plugins_core-0.2.0a0.tar.gz", hash = "sha256:732659e4a28d87b87fc0eded889e408042b865ae80e95b071eb82a540b265af8"},
 ]
 
 [package.dependencies]
@@ -212,7 +212,9 @@ credentials-centrify-vault-kv = ["awx-plugins.interfaces", "requests"]
 credentials-conjur = ["awx-plugins.interfaces", "requests"]
 credentials-github-app = ["PyGithub", "awx-plugins.interfaces"]
 credentials-hashivault-kv = ["awx-plugins.interfaces", "requests"]
+credentials-hashivault-kv-oidc = ["awx-plugins.interfaces", "requests"]
 credentials-hashivault-ssh = ["awx-plugins.interfaces", "requests"]
+credentials-hashivault-ssh-oidc = ["awx-plugins.interfaces", "requests"]
 credentials-thycotic-dsv = ["awx-plugins.interfaces", "python-dsv-sdk (>=1.0.4)"]
 credentials-thycotic-tss = ["awx-plugins.interfaces", "python-tss-sdk (>=1.2.1)"]
 inventory-azure-rm = ["PyYAML", "awx-plugins.interfaces"]
@@ -227,6 +229,7 @@ inventory-rhv = ["PyYAML", "awx-plugins.interfaces"]
 inventory-satellite6 = ["PyYAML", "awx-plugins.interfaces"]
 inventory-terraform = ["PyYAML", "awx-plugins.interfaces"]
 inventory-vmware = ["PyYAML", "awx-plugins.interfaces"]
+inventory-vmware-esxi = ["PyYAML", "awx-plugins.interfaces"]
 
 [[package]]
 name = "awx-plugins-interfaces"
@@ -4096,4 +4099,4 @@ dev = ["psycopg-binary"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.13"
-content-hash = "b2300e1590c5b82c27292d01464819e1cfa6e3c7b2cc1cbc0ce3fc947c7bfc0e"
+content-hash = "dfeedca7d1ad7cc93f60ba0458166ea11f43f62194be08ed231e23a6d3162e45"
