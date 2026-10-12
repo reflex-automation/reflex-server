@@ -36,6 +36,8 @@ jobs:
           image-ref: ${{ env.IMAGE }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+          # sample key in a docstring, not a secret
+          skip-files: app/venv/lib/python3.12/site-packages/autobahn/wamp/cryptosign.py
           exit-code: '0'
 
   rescan:
@@ -47,4 +49,6 @@ jobs:
           image-ref: ${{ env.IMAGE }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+          # sample key in a docstring, not a secret
+          skip-files: app/venv/lib/python3.12/site-packages/autobahn/wamp/cryptosign.py
           exit-code: '1'
