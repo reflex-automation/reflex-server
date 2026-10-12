@@ -16,7 +16,7 @@
 import json
 import logging
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import transaction
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
@@ -79,7 +79,9 @@ def _wants_sync(project: Project, request, payload: dict) -> bool:
         return False
 
     if payload.get("deleted") or (
-        payload.get("after") and set(payload["after"]) == {"0"}
+        isinstance(payload.get("after"), str)
+        and payload["after"]
+        and set(payload["after"]) == {"0"}
     ):
         return False
 
@@ -123,11 +125,18 @@ class ExternalProjectViewSet(viewsets.GenericViewSet):
             inputs = get_resolved_secrets(project.webhook_credential)
         except CredentialPluginError as err:
             logger.warning("Error fetching external secrets %s", str(err))
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(AUTH_FAILED, status=status.HTTP_403_FORBIDDEN)
 
         try:
             _verify(request, inputs)
-        except (AuthenticationFailed, KeyError, IndexError):
+        except (
+            AuthenticationFailed,
+            KeyError,
+            IndexError,
+            ValueError,
+            TypeError,
+            SuspiciousOperation,  # body over DATA_UPLOAD_MAX_MEMORY_SIZE
+        ):
             return Response(AUTH_FAILED, status=status.HTTP_403_FORBIDDEN)
 
         if request.headers.get("X-GitHub-Event") == "ping":
@@ -135,7 +144,7 @@ class ExternalProjectViewSet(viewsets.GenericViewSet):
 
         try:
             payload = json.loads(request.body)
-        except ValueError:
+        except (ValueError, RecursionError):
             payload = None
         if not isinstance(payload, dict):
             return Response(

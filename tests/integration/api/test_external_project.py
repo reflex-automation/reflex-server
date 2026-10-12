@@ -422,3 +422,28 @@ def test_webhook_credential_requires_credential_use_permission(
     assert response.status_code == status.HTTP_403_FORBIDDEN
     new_project.refresh_from_db()
     assert new_project.webhook_credential_id is None
+
+
+@pytest.mark.django_db
+def test_oversized_body_is_uniform_403(hmac_project, sync_mock):
+    raw = b" " * (2_621_440 + 1)
+    response = post_push(hmac_project, raw=raw)
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json() == {"detail": "Authentication failed"}
+
+
+@pytest.mark.django_db
+def test_bad_hash_algorithm_is_403(hmac_project, sync_mock):
+    cred = hmac_project.webhook_credential
+    cred.inputs = inputs_to_store(_hmac_inputs(hash_algorithm="sha1024"))
+    cred.save()
+    response = post_push(hmac_project, {"ref": "refs/heads/main"})
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_hostile_payloads_do_not_500(hmac_project, sync_mock):
+    response = post_push(hmac_project, {"after": 5, "ref": "refs/heads/main"})
+    assert response.status_code == status.HTTP_202_ACCEPTED
+    response = post_push(hmac_project, raw=b"[" * 200000)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
