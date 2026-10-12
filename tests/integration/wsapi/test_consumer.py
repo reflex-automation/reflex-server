@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 import pytest
 import pytest_asyncio
+import yaml
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.core.exceptions import ObjectDoesNotExist
@@ -1859,5 +1860,69 @@ async def test_get_rule_engine_credential_uses_default(
             break
 
     assert received_end, "Should receive EndOfResponse with default credential"
+
+    await ws_communicator.disconnect()
+
+
+@database_sync_to_async
+def _set_suggest_only(rulebook_process_id: int, rulesets: str, value: bool):
+    activation = models.RulebookProcess.objects.get(
+        id=rulebook_process_id
+    ).activation
+    activation.suggest_only = value
+    activation.rulebook_rulesets = rulesets
+    activation.save(update_fields=["suggest_only", "rulebook_rulesets"])
+
+
+SUGGEST_ONLY_RULESETS = """
+---
+- name: hello
+  hosts: all
+  sources:
+    - ansible.eda.range:
+        limit: 1
+  rules:
+    - name: r
+      condition: event.i == 0
+      action:
+        run_job_template:
+          name: jt
+          organization: org
+"""
+
+
+@pytest.mark.parametrize("suggest_only", [True, False])
+@pytest.mark.django_db(transaction=True)
+async def test_handle_workers_suggest_only(
+    preseed_credential_types,
+    default_organization: models.Organization,
+    suggest_only: bool,
+):
+    rulebook_process_id = await _prepare_activation_instance_with_credentials(
+        default_organization, []
+    )
+    await _set_suggest_only(
+        rulebook_process_id, SUGGEST_ONLY_RULESETS, suggest_only
+    )
+
+    ws_communicator = await create_ws_communicator_with_token(
+        rulebook_process_id
+    )
+    connected, _ = await ws_communicator.connect()
+    assert connected
+
+    await ws_communicator.send_json_to(
+        {
+            "type": "Worker",
+            "activation_id": rulebook_process_id,
+            "activation_instance_id": rulebook_process_id,
+        }
+    )
+    response = await ws_communicator.receive_json_from(timeout=TIMEOUT)
+    assert response["type"] == "Rulebook"
+    rulesets = base64.b64decode(response["data"]).decode()
+    action = yaml.safe_load(rulesets)[0]["rules"][0]["action"]
+    assert ("debug" in action) is suggest_only
+    assert ("run_job_template" in action) is not suggest_only
 
     await ws_communicator.disconnect()

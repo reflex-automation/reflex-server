@@ -19,6 +19,7 @@ from aap_eda.core.utils.rulebook import (
     _get_source_type,
     build_source_list,
     build_source_name_updates,
+    make_suggest_only,
     rulebook_sources_unchanged,
 )
 
@@ -247,3 +248,50 @@ def test_get_source_type_with_name_and_filters():
 
 def test_get_source_type_empty():
     assert _get_source_type({}) is None
+
+
+SUGGEST_RULESETS = """---
+- name: rs
+  hosts: all
+  rules:
+    - name: single
+      condition: event
+      action:
+        run_job_template:
+          name: jt
+          organization: org
+    - name: multi
+      condition: event
+      actions:
+        - run_workflow_template:
+            name: wf
+        - run_playbook:
+            name: pb.yml
+        - run_module:
+            name: ansible.builtin.ping
+        - debug:
+            msg: keep
+        - set_fact:
+            fact:
+              a: 1
+"""
+
+
+def test_make_suggest_only():
+    rules = yaml.safe_load(make_suggest_only(SUGGEST_RULESETS))[0]["rules"]
+    assert rules[0]["action"] == {
+        "debug": {
+            "msg": "suggest_only: would run_job_template jt (organization org)"
+        }
+    }
+    assert rules[1]["actions"] == [
+        {"debug": {"msg": "suggest_only: would run_workflow_template wf"}},
+        {"debug": {"msg": "suggest_only: would run_playbook pb.yml"}},
+        {
+            "debug": {
+                "msg": "suggest_only: would run_module ansible.builtin.ping"
+            }
+        },
+        {"debug": {"msg": "keep"}},
+        {"set_fact": {"fact": {"a": 1}}},
+    ]

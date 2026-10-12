@@ -285,3 +285,38 @@ def _updated_event_stream_source(
         updated_source["filters"] = source["filters"]
     LOGGER.info("Source %s updated with Event Stream Source", name)
     return updated_source
+
+
+_SUGGEST_ONLY_ACTIONS = (
+    "run_job_template",
+    "run_workflow_template",
+    "run_playbook",
+    "run_module",
+)
+
+
+def _suggest_only_action(action: object) -> object:
+    if not isinstance(action, dict):
+        return action
+    for key in _SUGGEST_ONLY_ACTIONS:
+        if key in action:
+            args = action[key] or {}
+            msg = f"suggest_only: would {key} {args.get('name', '')}"
+            if args.get("organization"):
+                msg += f" (organization {args['organization']})"
+            return {"debug": {"msg": msg}}
+    return action
+
+
+def make_suggest_only(rulesets_data: str) -> str:
+    """Replace executing actions with debug messages."""
+    rulesets = _parse_rulesets(rulesets_data)
+    for ruleset in rulesets:
+        for rule in ruleset.get("rules") or []:
+            if "action" in rule:
+                rule["action"] = _suggest_only_action(rule["action"])
+            if "actions" in rule:
+                rule["actions"] = [
+                    _suggest_only_action(a) for a in rule["actions"] or []
+                ]
+    return yaml.dump(rulesets, sort_keys=False)

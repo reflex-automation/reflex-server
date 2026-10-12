@@ -972,6 +972,7 @@ def assert_activation_base_data(
     assert data["modified_at"] <= activation.modified_at
     assert data["status_message"]
     assert data["store_debug_logs"] == activation.store_debug_logs
+    assert data["suggest_only"] == activation.suggest_only
 
 
 def assert_activation_related_object_fks(
@@ -2898,3 +2899,40 @@ def test_create_activation_with_only_rule_engine_credential(
     assert activation.rule_engine_credential.id == (
         rule_engine_credential.id
     ), "Rule engine credential should be in FK field"
+
+
+@pytest.mark.django_db
+@patch(
+    "aap_eda.api.views.activation.check_dispatcherd_workers_health",
+    return_value=True,
+)
+def test_activation_suggest_only_round_trip(
+    mock_health_check,
+    activation_payload: Dict[str, Any],
+    default_rulebook: models.Rulebook,
+    admin_client: APIClient,
+):
+    activation_payload["is_enabled"] = False
+    activation_payload["suggest_only"] = True
+    response = admin_client.post(
+        f"{api_url_v1}/activations/", data=activation_payload
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data["suggest_only"] is True
+    a_id = response.data["id"]
+
+    response = admin_client.get(f"{api_url_v1}/activations/{a_id}/")
+    assert response.data["suggest_only"] is True
+
+    response = admin_client.post(
+        f"{api_url_v1}/activations/{a_id}/copy/", data={"name": "copy"}
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data["suggest_only"] is True
+
+    response = admin_client.patch(
+        f"{api_url_v1}/activations/{a_id}/", data={"suggest_only": False}
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["suggest_only"] is False
+    assert models.Activation.objects.get(id=a_id).suggest_only is False

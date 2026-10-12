@@ -29,6 +29,7 @@ from aap_eda.core.utils.credentials import (
     get_resolved_secrets,
     get_secret_fields,
 )
+from aap_eda.core.utils.rulebook import make_suggest_only
 from aap_eda.core.utils.strings import extract_variables, substitute_variables
 from aap_eda.middleware.request_log_middleware import assign_log_tracking_id
 from aap_eda.services.auth import parse_jwt_token
@@ -327,6 +328,8 @@ class AnsibleRulebookConsumer(AsyncWebsocketConsumer):
         )
         activation = await self.get_activation(message.activation_id)
         rulesets = activation.rulebook_rulesets
+        if activation.suggest_only:
+            rulesets = make_suggest_only(rulesets)
         extra_var = activation.extra_var
 
         rulebook_message = Rulebook(
