@@ -89,7 +89,8 @@ RUN if [ -f /app/.ssh/github_key ]; then \
     fi
 COPY . $SOURCES_DIR/
 RUN poetry install -E all --only-root
-RUN pip install ansible-core==${ANSIBLE_CORE_VER}
+RUN pip install ansible-core==${ANSIBLE_CORE_VER} \
+    && pip uninstall -y pip
 RUN EDA_SECRET_KEY=dummy EDA_STATIC_ROOT=${STATIC_ROOT} aap-eda-manage collectstatic --noinput --clear
 
 USER 0
