@@ -273,6 +273,8 @@ AUTOMATION_ANALYTICS_URL: str = (
 )
 AUTOMATION_ANALYTICS_OIDC_TOKEN_URL: str = "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"  # noqa: E501
 ANALYTICS_PROXY_URL: Optional[str] = None
+# static bearer token for /metrics/ (superusers can always access)
+METRICS_TOKEN: Optional[str] = None
 INSIGHTS_CERT_PATH: str = "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
 AUTOMATION_AUTH_METHOD: str = "service-account"
 INSIGHTS_TRACKING_STATE: bool = False

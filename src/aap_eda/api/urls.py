@@ -30,7 +30,7 @@ from rest_framework import routers
 
 from aap_eda.core import views as core_views
 
-from . import views
+from . import metrics, views
 
 router = routers.SimpleRouter()
 # basename has to be set when queryset is user-dependent
@@ -90,6 +90,7 @@ openapi_urls = [
 eda_v1_urls = [
     path("config/", views.ConfigView.as_view(), name="config"),
     path("status/", core_views.StatusView.as_view(), name="status"),
+    path("metrics/", metrics.MetricsView.as_view(), name="metrics"),
     path("", include(openapi_urls)),
     # shadows DAB's ui_auth route, whose get() signature is broken without
     # ansible_base.api_documentation installed

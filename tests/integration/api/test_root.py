@@ -24,6 +24,7 @@ from tests.integration.constants import api_url_v1
             [
                 "/config/",
                 "/status/",
+                "/metrics/",
                 "/openapi.json",
                 "/openapi.yaml",
                 "/docs",
@@ -60,6 +61,7 @@ from tests.integration.constants import api_url_v1
             [
                 "/config/",
                 "/status/",
+                "/metrics/",
                 "/role_definitions/",
                 "/role_user_assignments/",
                 "/role_team_assignments/",
