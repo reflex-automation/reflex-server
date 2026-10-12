@@ -5,7 +5,7 @@ The API server for Reflex, a close-tracking fork of Event-Driven Ansible
 [CIQ Ascender](https://ciq.com/products/ascender).
 
 [ansible/eda-server](https://github.com/ansible/eda-server) is actively
-developed in public by Red Hat. Reflex exists for the things upstream does
+developed in public by Red Hat. Reflex adds what upstream does
 not carry by default, such as standalone login (see below), plus a
 user-facing rebrand, published images and end-to-end smoke tests against
 Ascender. It is a friendly fork: the patch set stays small, upstream merges
