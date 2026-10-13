@@ -219,6 +219,20 @@ def check_credential_types_for_gpg(eda_credential_id: int) -> int:
     return eda_credential_id
 
 
+def check_credential_types_for_webhook(eda_credential_id: int) -> int:
+    check_credential_types(
+        eda_credential_id,
+        [
+            enums.EventStreamCredentialType.HMAC,
+            enums.EventStreamCredentialType.TOKEN,
+            enums.CustomEventStreamCredentialType.GITHUB,
+            enums.CustomEventStreamCredentialType.GITLAB,
+        ],
+    )
+
+    return eda_credential_id
+
+
 def check_credential_types_for_scm(eda_credential_id: int) -> int:
     check_credential_types(
         eda_credential_id,

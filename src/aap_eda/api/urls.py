@@ -63,6 +63,11 @@ router.register(
     views.ExternalEventStreamViewSet,
     basename="external_event_stream",
 )
+router.register(
+    "external_project",
+    views.ExternalProjectViewSet,
+    basename="external_project",
+)
 
 openapi_urls = [
     path(

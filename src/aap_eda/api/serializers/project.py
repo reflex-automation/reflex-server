@@ -12,9 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import typing as tp
 from urllib.parse import urlparse, urlunparse
 
 from ansible_base.lib.serializers.mixins import CleanTextMixin
+from django.urls import reverse
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -67,6 +69,7 @@ class ProjectSerializer(serializers.ModelSerializer, ProxyFieldMixin):
             "organization_id",
             "eda_credential_id",
             "signature_validation_credential_id",
+            "webhook_credential_id",
             "scm_branch",
             "scm_refspec",
             "verify_ssl",
@@ -102,6 +105,11 @@ class ProjectCreateRequestSerializer(
         required=False,
         allow_null=True,
         validators=[validators.check_credential_types_for_gpg],
+    )
+    webhook_credential_id = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+        validators=[validators.check_credential_types_for_webhook],
     )
     url = serializers.CharField(
         required=True,
@@ -151,6 +159,7 @@ class ProjectCreateRequestSerializer(
             "organization_id",
             "eda_credential_id",
             "signature_validation_credential_id",
+            "webhook_credential_id",
             "verify_ssl",
             "scm_type",
             "scm_branch",
@@ -201,6 +210,15 @@ class ProjectUpdateRequestSerializer(
         validators=[
             validators.check_credential_types_for_gpg,
         ],
+    )
+    webhook_credential_id = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+        help_text=(
+            "ID of an optional HMAC, token, GitHub or GitLab credential; "
+            "when set, a push webhook can trigger a project sync"
+        ),
+        validators=[validators.check_credential_types_for_webhook],
     )
     verify_ssl = serializers.BooleanField(
         required=False,
@@ -261,6 +279,7 @@ class ProjectUpdateRequestSerializer(
             "organization_id",
             "eda_credential_id",
             "signature_validation_credential_id",
+            "webhook_credential_id",
             "scm_branch",
             "scm_refspec",
             "verify_ssl",
@@ -303,6 +322,10 @@ class ProjectReadSerializer(serializers.ModelSerializer, ProxyFieldMixin):
     signature_validation_credential = EdaCredentialRefSerializer(
         required=False, allow_null=True
     )
+    webhook_credential = EdaCredentialRefSerializer(
+        required=False, allow_null=True
+    )
+    webhook_path = serializers.SerializerMethodField()
     proxy = serializers.SerializerMethodField()
     created_by = BasicUserFieldSerializer()
     modified_by = BasicUserFieldSerializer()
@@ -325,6 +348,8 @@ class ProjectReadSerializer(serializers.ModelSerializer, ProxyFieldMixin):
             "organization",
             "eda_credential",
             "signature_validation_credential",
+            "webhook_credential",
+            "webhook_path",
             "verify_ssl",
             "scm_branch",
             "scm_refspec",
@@ -337,6 +362,13 @@ class ProjectReadSerializer(serializers.ModelSerializer, ProxyFieldMixin):
             *read_only_fields,
         ]
 
+    def get_webhook_path(self, project) -> tp.Optional[str]:
+        if not project.webhook_credential_id:
+            return None
+        return reverse(
+            "external_project-post", kwargs={"pk": project.webhook_uuid}
+        )
+
     def to_representation(self, project):
         eda_credential = (
             EdaCredentialRefSerializer(project.eda_credential).data
@@ -348,6 +380,11 @@ class ProjectReadSerializer(serializers.ModelSerializer, ProxyFieldMixin):
                 project.signature_validation_credential
             ).data
             if project.signature_validation_credential
+            else None
+        )
+        webhook_credential = (
+            EdaCredentialRefSerializer(project.webhook_credential).data
+            if project.webhook_credential
             else None
         )
         organization = (
@@ -370,6 +407,8 @@ class ProjectReadSerializer(serializers.ModelSerializer, ProxyFieldMixin):
             "organization": organization,
             "eda_credential": eda_credential,
             "signature_validation_credential": signature_validation_credential,
+            "webhook_credential": webhook_credential,
+            "webhook_path": self.get_webhook_path(project),
             "update_revision_on_launch": project.update_revision_on_launch,
             "scm_update_cache_timeout": project.scm_update_cache_timeout,
             "last_synced_at": project.last_synced_at,

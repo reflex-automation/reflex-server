@@ -26,6 +26,7 @@
 
 import datetime
 import logging
+import uuid
 
 from django.db import models
 from django.utils import timezone
@@ -79,6 +80,19 @@ class Project(BaseOrgModel, UniqueNamedModel, PrimordialModel):
         null=True,
         default=None,
         on_delete=models.SET_NULL,
+    )
+
+    # webhook is on when set; HMAC/Token secret lives in the credential
+    webhook_credential = models.ForeignKey(
+        "EdaCredential",
+        related_name="%(class)ss_webhook",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.SET_NULL,
+    )
+    webhook_uuid = models.UUIDField(
+        default=uuid.uuid4, unique=True, editable=False
     )
     archive_file = models.FileField(upload_to=PROJECT_ARCHIVE_DIR)
 
