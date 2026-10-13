@@ -150,6 +150,13 @@ class Activation(
             "container stdout but not stored in the database."
         ),
     )
+    suggest_only = models.BooleanField(
+        default=False,
+        help_text=(
+            "Replace job template, workflow, playbook and module actions "
+            "with a debug message instead of running them."
+        ),
+    )
     eda_credentials = models.ManyToManyField(
         "EdaCredential", related_name="activations", default=None
     )
