@@ -1,6 +1,6 @@
 # Reflex Server
 
-The API server for Reflex, a community-maintained continuation of
+The API server for Reflex, a community-maintained fork of
 Event-Driven Ansible (EDA) that targets open-source AWX-compatible
 controllers, mainly [CIQ Ascender](https://ciq.com/products/ascender).
 
