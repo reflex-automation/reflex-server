@@ -88,7 +88,7 @@ awx-plugins-core = { version = "^0.2.0a0", extras = [
                               "credentials-thycotic-dsv",
                               "credentials-thycotic-tss"
                     ]}
-pyasn1 = ">=0.6.4"
+pyasn1 = ">=0.6.5"
 # limit setuptools to avoid the pkg_resources removal
 setuptools = "<84"
 
